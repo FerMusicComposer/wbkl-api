@@ -1,20 +1,27 @@
-// import type { Core } from '@strapi/strapi';
+import type { Core } from '@strapi/strapi';
 
 export default {
-  /**
-   * An asynchronous register function that runs before
-   * your application is initialized.
-   *
-   * This gives you an opportunity to extend code.
-   */
   register(/* { strapi }: { strapi: Core.Strapi } */) {},
 
-  /**
-   * An asynchronous bootstrap function that runs before
-   * your application gets started.
-   *
-   * This gives you an opportunity to set up your data model,
-   * run jobs, or perform some special logic.
-   */
-  bootstrap(/* { strapi }: { strapi: Core.Strapi } */) {},
+  async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    const localesService = strapi.plugin('i18n').service('locales');
+
+    const existingLocales = await localesService.find();
+    const existingCodes = existingLocales.map((l: any) => l.code);
+
+    if (!existingCodes.includes('es')) {
+      await localesService.create({ code: 'es', name: 'Spanish (es)' });
+    }
+
+    if (!existingCodes.includes('en')) {
+      await localesService.create({ code: 'en', name: 'English (en)' });
+    }
+
+    const coreStore = strapi.store({ type: 'core' });
+    const currentDefault = await coreStore.get({ key: 'default_locale' });
+
+    if (!currentDefault || currentDefault !== 'es') {
+      await coreStore.set({ key: 'default_locale', value: 'es' });
+    }
+  },
 };
