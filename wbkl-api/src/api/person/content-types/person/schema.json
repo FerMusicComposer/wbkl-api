@@ -65,6 +65,14 @@
         }
       }
     },
+    "boardPosition": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
     "sortOrder": {
       "type": "integer",
       "pluginOptions": {
